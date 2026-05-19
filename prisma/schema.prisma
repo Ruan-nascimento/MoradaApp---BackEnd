@@ -6,9 +6,25 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String
+model Usuario {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  reservas  Reservas[]
+}
+
+model Reservas {
+  id        String   @id @default(uuid())
+  nome      String
+  data      String
+  hora      String
+  userId    String
+  user      Usuario  @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reservas")
 }
