@@ -76,6 +76,8 @@ export const cadastroController = async (req: Request, res: Response) => {
             message: "Erro desconhecido ao cadastrar usuário. Tente Novamente!",
             success: false
         });
+    } finally {
+        await prisma.$disconnect();
     }
 
 

@@ -35,6 +35,8 @@ export const meController = async (req: AuthRequest, res: Response) => {
             message: "Erro desconhecido ao buscar usuário. Tente Novamente!",
             success: false
         });
+    } finally {
+        await prisma.$disconnect();
     }
 
 

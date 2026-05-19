@@ -18,7 +18,8 @@ export function authMiddleware(
 
     if (!authHeader) {
         return res.status(401).json({
-            message: "Token não enviado"
+            message: "Token não enviado",
+            success: false
         });
     }
 
@@ -35,7 +36,8 @@ export function authMiddleware(
         next();
     } catch {
         return res.status(401).json({
-            message: "Token inválido ou expirado"
+            message: "Token inválido ou expirado",
+            success: false
         });
     }
 }
