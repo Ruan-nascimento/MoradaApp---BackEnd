@@ -20,16 +20,16 @@ router.post('/login', loginController)
 router.post('/cadastro', cadastroController)
 
 // vai retornar todos os dados mockados do banco de dados para o frontend
-router.get('/get-all-data', getAllDataController)
+router.get('/get-all-data', authMiddleware, getAllDataController)
 
 // vai pegar os dados da reserva selecionada e salvar no banco de dados como uma reserva do usuário
-router.post('/criar-reserva', createReservationController)
+router.post('/criar-reserva', authMiddleware, createReservationController)
 
 // vai buscar no banco de dados todas as reservas feitas pelo usuário logado 
-router.post('/listar-reservas', listarReservasController)
+router.post('/listar-reservas', authMiddleware, listarReservasController)
 
 // vai receber o id da reserva e deletar ela do banco de dados
-router.delete('/cancelar-reserva', cancelarReservaController)
+router.delete('/cancelar-reserva', authMiddleware, cancelarReservaController)
 
 
 
