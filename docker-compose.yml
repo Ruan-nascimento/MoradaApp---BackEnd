@@ -1,0 +1,12 @@
+services:
+  api:
+    build:
+      context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+    container_name: morada_api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
