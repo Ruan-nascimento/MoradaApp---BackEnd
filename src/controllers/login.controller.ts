@@ -66,8 +66,6 @@ export const loginController = async (req: Request, res: Response) => {
             message: "Erro desconhecido ao fazer login. Tente Novamente!",
             success: false
         });
-    } finally {
-        await prisma.$disconnect();
     }
 
 
