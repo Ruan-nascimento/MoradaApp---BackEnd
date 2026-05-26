@@ -77,4 +77,6 @@ model Highlights {
   name      String
   imoveisId String
   imoveis   Imoveis @relation(fields: [imoveisId], references: [id])
+  createdAt DateTime @default (now())
+  updatedAt DateTime @updatedAt
 }
