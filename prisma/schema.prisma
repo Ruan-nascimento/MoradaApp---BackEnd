@@ -7,76 +7,82 @@ datasource db {
 }
 
 model Usuario {
-  id        String     @id @default(uuid())
-  email     String     @unique
+  id        String      @id @default(uuid())
+  email     String      @unique
   name      String
   password  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   reservas  Reservas[]
   favoritos Favoritos[]
 }
 
 model Reservas {
-  id        String   @id @default(uuid())
+  id         String   @id @default(uuid())
   imoveisId  String
-  imoveis   Imoveis  @relation(fields: [imoveisId], references: [id])
-  userId    String
-  user      Usuario  @relation(fields: [userId], references: [id])
-  chekIn    DateTime
-  chekOut   DateTime
+  imoveis    Imoveis  @relation(fields: [imoveisId], references: [id])
+  userId     String
+  user       Usuario  @relation(fields: [userId], references: [id])
+  chekIn     DateTime
+  chekOut    DateTime
   finalValue Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
+
 model Favoritos {
   id        String   @id @default(uuid())
   imoveisId String
-  imoveis   Imoveis  @relation(fields:[imoveisId], references: [id])
+  imoveis   Imoveis  @relation(fields: [imoveisId], references: [id])
   userId    String
-  user      Usuario  @relation(fields:[userId], references: [id])
+  user      Usuario  @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Host {
-  id        String   @id @default (uuid())
-  name      String 
+  id        String    @id @default(uuid())
+  name      String
   photo     String
   imoveis   Imoveis[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
+
 model Imoveis {
-  id        String  @id @default (uuid())
-  photo     String 
-  uf        String
-  city      String
-  title     String
-  hostId    String
-  host      Host    @relation(fields:[hostId], references:[id])
+  id         String       @id @default(uuid())
+  photo      String
+  uf         String
+  city       String
+  title      String
+  hostId     String
+  host       Host         @relation(fields: [hostId], references: [id])
   highlights Highlights[]
-  reviews   Reviews[]
-  price     Int
-  reservas  Reservas[]
-  favoritos Favoritos[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  reviews    Reviews[]
+  price      Int
+  reservas   Reservas[]
+  favoritos  Favoritos[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
+
 model Reviews {
   id        String   @id @default(uuid())
   imoveisId String
-  imoveis   Imoveis  @relation(fields: [imoveisId], references:[id])
-  createdAt DateTime @default (now())
+  imoveis   Imoveis  @relation(fields: [imoveisId], references: [id])
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  name      String 
+  imgUser   String
+  name      String
   stars     Int
   comment   String   @db.VarChar(250)
 }
+
 model Highlights {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
   imoveisId String
-  imoveis   Imoveis @relation(fields: [imoveisId], references: [id])
-  createdAt DateTime @default (now())
+  imoveis   Imoveis  @relation(fields: [imoveisId], references: [id])
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
