@@ -7,6 +7,7 @@ import { listarReservasController } from '../controllers/listarReservas.controll
 import { cancelarReservaController } from '../controllers/cancelarReserva.controller';
 import { authMiddleware } from '../middlewares/auth';
 import { meController } from '../controllers/me.controller';
+import { listImoveisController } from '../controllers/listImoveis.controller';
 
 const router = Router();
 
@@ -31,6 +32,7 @@ router.post('/listar-reservas', authMiddleware, listarReservasController)
 // vai receber o id da reserva e deletar ela do banco de dados
 router.delete('/cancelar-reserva', authMiddleware, cancelarReservaController)
 
-
+// vai listar os imoveis disponiveis com paginação
+router.get('/imoveis', listImoveisController)
 
 export default router;
