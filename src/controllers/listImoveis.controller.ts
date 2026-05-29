@@ -28,7 +28,8 @@ export const listImoveisController = async (req: Request, res: Response): Promis
       data: imoveis,
       total,
       page,
-      limit
+      limit,
+      hasNextPage: skip + imoveis.length < total
     });
   } catch (error) {
     console.error("Erro ao listar imóveis:", error);
