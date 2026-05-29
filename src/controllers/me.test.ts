@@ -11,6 +11,11 @@ describe("Me Controller", () => {
 
     beforeEach(async () => {
         await prisma.reservas.deleteMany();
+        await prisma.favoritos.deleteMany();
+        await prisma.reviews.deleteMany();
+        await prisma.highlights.deleteMany();
+        await prisma.imoveis.deleteMany();
+        await prisma.host.deleteMany();
         await prisma.usuario.deleteMany();
     });
 
@@ -72,15 +77,31 @@ describe("Me Controller", () => {
             },
         });
 
+        const host = await prisma.host.create({
+            data: {
+                name: "Host Teste",
+                photo: "https://example.com/host.jpg",
+            },
+        });
+
+        const imovel = await prisma.imoveis.create({
+            data: {
+                title: "Imóvel Teste",
+                photo: "https://example.com/imovel.jpg",
+                uf: "PE",
+                city: "Recife",
+                price: 100,
+                hostId: host.id,
+            },
+        });
+
         await prisma.reservas.create({
             data: {
-                hora: "19:00",
-                nome: "Reserva Teste",
-                createdAt: new Date(),
-                updatedAt: new Date(),
                 userId: user.id,
-                data: new Date("2024-12-31").toISOString()
-
+                imoveisId: imovel.id,
+                chekIn: new Date("2026-01-01T14:00:00Z"),
+                chekOut: new Date("2026-01-02T12:00:00Z"),
+                finalValue: 100,
             },
         });
 

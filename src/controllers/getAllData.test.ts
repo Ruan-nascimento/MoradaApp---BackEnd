@@ -28,19 +28,39 @@ describe("Get All Data Controller", () => {
     it("deve retornar todas as reservas cadastradas", async () => {
         const { user, token } = await createAuthenticatedUser();
 
+        const host = await prisma.host.create({
+            data: {
+                name: "Host Teste",
+                photo: "https://example.com/host.jpg",
+            },
+        });
+
+        const imovel = await prisma.imoveis.create({
+            data: {
+                title: "Imóvel Teste",
+                photo: "https://example.com/imovel.jpg",
+                uf: "PE",
+                city: "Recife",
+                price: 100,
+                hostId: host.id,
+            },
+        });
+
         await prisma.reservas.createMany({
             data: [
                 {
-                    hora: "19:00",
-                    nome: "Reserva Teste 1",
                     userId: user.user.id,
-                    data: new Date("2026-01-01").toISOString(),
+                    imoveisId: imovel.id,
+                    chekIn: new Date("2026-01-01T14:00:00Z"),
+                    chekOut: new Date("2026-01-02T12:00:00Z"),
+                    finalValue: 100,
                 },
                 {
-                    hora: "20:00",
-                    nome: "Reserva Teste 2",
                     userId: user.user.id,
-                    data: new Date("2026-01-02").toISOString(),
+                    imoveisId: imovel.id,
+                    chekIn: new Date("2026-01-03T14:00:00Z"),
+                    chekOut: new Date("2026-01-04T12:00:00Z"),
+                    finalValue: 100,
                 },
             ],
         });
@@ -56,14 +76,14 @@ describe("Get All Data Controller", () => {
         expect(response.body.data).toEqual(
             expect.arrayContaining([
                 expect.objectContaining({
-                    nome: "Reserva Teste 1",
-                    hora: "19:00",
                     userId: user.user.id,
+                    imoveisId: imovel.id,
+                    finalValue: 100,
                 }),
                 expect.objectContaining({
-                    nome: "Reserva Teste 2",
-                    hora: "20:00",
                     userId: user.user.id,
+                    imoveisId: imovel.id,
+                    finalValue: 100,
                 }),
             ])
         );

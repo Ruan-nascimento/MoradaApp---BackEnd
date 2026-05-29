@@ -7,5 +7,6 @@ export default defineConfig({
         include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
         setupFiles: ["./tests/setup.ts"],
         fileParallelism: false,
+        maxWorkers: 1,
     },
 });

@@ -8,8 +8,12 @@ beforeAll(async () => {
 
 
 beforeEach(async () => {
-
     await prisma.reservas.deleteMany();
+    await prisma.favoritos.deleteMany();
+    await prisma.reviews.deleteMany();
+    await prisma.highlights.deleteMany();
+    await prisma.imoveis.deleteMany();
+    await prisma.host.deleteMany();
     await prisma.usuario.deleteMany();
 });
 

@@ -16,6 +16,7 @@ export const meController = async (req: AuthRequest, res: Response) => {
                     id: true,
                     email: true,
                     name: true,
+                    reservas: true,
                 }
             });
             if (!user) {
