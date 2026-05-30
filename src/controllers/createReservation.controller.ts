@@ -51,11 +51,31 @@ export const createReservationController = async (req: AuthRequest, res: Respons
     checkInDate.setHours(12, 0, 0, 0);
     checkOutDate.setHours(12, 0, 0, 0);
 
+    // Validação de colisão de datas
+    const conflito = await prisma.reservas.findFirst({
+      where: {
+        imoveisId,
+        chekIn: {
+          lt: checkOutDate,
+        },
+        chekOut: {
+          gt: checkInDate,
+        },
+      },
+    });
+
+    if (conflito) {
+      return res.status(400).json({
+        success: false,
+        message: "Este imóvel já está reservado no período selecionado.",
+      });
+    }
+
     const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
     const nights = Math.max(1, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
     const finalValue = imovel.price * nights;
 
-    // Criar a reserva no banco de dados temporariamente
+    // Criar a reserva de fato no banco de dados
     const reserva = await prisma.reservas.create({
       data: {
         imoveisId,
@@ -66,69 +86,10 @@ export const createReservationController = async (req: AuthRequest, res: Respons
       },
     });
 
-    // Chamar API da Abacate Pay
-    const abacatePayKey = process.env.ABACATE_PAY_KEY;
-    const finalValueInCents = finalValue * 100;
-
-    let pixCode = "";
-    let pixQrCodeBase64 = "";
-
-    try {
-      const response = await fetch("https://api.abacatepay.com/v2/transparents/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${abacatePayKey}`,
-        },
-        body: JSON.stringify({
-          method: "PIX",
-          data: {
-            amount: finalValueInCents,
-            description: `Reserva do imovel: ${imovel.title}`,
-            expiresIn: 3600,
-            externalId: reserva.id,
-            customer: {
-              name: user.name,
-              email: user.email,
-              taxId: "12345678909", // cpf ficticio exigido
-              cellphone: "11999999999",
-            },
-          },
-        }),
-      });
-
-      const resData = await response.json() as any;
-
-      if (response.ok && resData.success && resData.data) {
-        pixCode = resData.data.brCode;
-        pixQrCodeBase64 = resData.data.brCodeBase64;
-
-        // Atualizar reserva com os códigos do PIX
-        await prisma.reservas.update({
-          where: { id: reserva.id },
-          data: {
-            pixCode,
-            pixQrCodeBase64,
-          },
-        });
-      } else {
-        console.error("Erro ao chamar Abacate Pay:", resData);
-      }
-    } catch (apiError) {
-      console.error("Erro na API da Abacate Pay:", apiError);
-    }
-
     return res.status(201).json({
       success: true,
       message: "Reserva criada com sucesso!",
-      data: {
-        reservaId: reserva.id,
-        chekIn: checkInDate,
-        chekOut: checkOutDate,
-        finalValue,
-        pixCode,
-        pixQrCodeBase64,
-      },
+      data: reserva,
     });
   } catch (error) {
     console.error("Erro ao criar reserva:", error);

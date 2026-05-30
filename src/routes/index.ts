@@ -3,6 +3,7 @@ import { loginController } from '../controllers/login.controller';
 import { cadastroController } from '../controllers/cadastro.controller';
 import { getAllDataController } from '../controllers/getAllData.controller';
 import { createReservationController } from '../controllers/createReservation.controller';
+import { confirmReservationController } from '../controllers/confirmReservation.controller';
 import { listarReservasController } from '../controllers/listarReservas.controller';
 import { cancelarReservaController } from '../controllers/cancelarReserva.controller';
 import { authMiddleware } from '../middlewares/auth';
@@ -26,6 +27,9 @@ router.get('/get-all-data', authMiddleware, getAllDataController)
 
 // vai pegar os dados da reserva selecionada e salvar no banco de dados como uma reserva do usuário
 router.post('/criar-reserva', authMiddleware, createReservationController)
+
+// vai simular pagamento e persistir a reserva de fato no banco de dados
+router.post('/confirmar-reserva', authMiddleware, confirmReservationController)
 
 // vai buscar no banco de dados todas as reservas feitas pelo usuário logado 
 router.post('/listar-reservas', authMiddleware, listarReservasController)
