@@ -16,7 +16,7 @@ const highlights: HighlightData[] = JSON.parse(rawData)
 
 const BATCH_SIZE = 50
 
-async function main() {
+export async function seedHighlights() {
   console.log(`🔄 Iniciando seed de highlights... (${highlights.length} registros)`)
 
   let inserted = 0
@@ -51,10 +51,3 @@ async function main() {
 
   console.log(`✅ ${highlights.length} highlights inseridos/atualizados com sucesso!`)
 }
-
-main()
-  .catch((e) => {
-    console.error("❌ Erro ao rodar seed de highlights:", e)
-    process.exit(1)
-  })
-  .finally(() => prisma.$disconnect())

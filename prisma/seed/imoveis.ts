@@ -2753,7 +2753,7 @@ const imoveis = [
 
 import { prisma } from '../../src/lib/prisma'
 
-async function main() {
+export async function seedImoveis() {
   for (let i = 0; i < imoveis.length; i++) {
     await prisma.imoveis.upsert({
       where: { id: imoveis[i].id },
@@ -2778,11 +2778,4 @@ async function main() {
   }
 
   console.log(`✅ ${imoveis.length} imóveis inseridos com sucesso!`)
-}
-
-main()
-  .catch((e) => {
-    console.error("Erro ao rodar seed:", e)
-    process.exit(1)
-  })
-  .finally(() => prisma.$disconnect())
+}

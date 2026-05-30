@@ -153,7 +153,7 @@ const hosts = [
 
 import { prisma } from '../../src/lib/prisma'
 
-async function main() {
+export async function seedHosts() {
   for (let i = 0; i < hosts.length; i++) {
     await prisma.host.upsert({
       where: { id: hosts[i].id },
@@ -172,9 +172,3 @@ async function main() {
   console.log(`✅ ${hosts.length} hosts inseridos com sucesso!`)
 }
 
-main()
-  .catch((e) => {
-    console.error("Erro ao rodar seed:", e)
-    process.exit(1)
-  })
-  .finally(() => prisma.$disconnect())

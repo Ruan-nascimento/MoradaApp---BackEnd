@@ -18,16 +18,18 @@ model Usuario {
 }
 
 model Reservas {
-  id         String   @id @default(uuid())
-  imoveisId  String
-  imoveis    Imoveis  @relation(fields: [imoveisId], references: [id])
-  userId     String
-  user       Usuario  @relation(fields: [userId], references: [id])
-  chekIn     DateTime
-  chekOut    DateTime
-  finalValue Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(uuid())
+  imoveisId       String
+  imoveis         Imoveis  @relation(fields: [imoveisId], references: [id])
+  userId          String
+  user            Usuario  @relation(fields: [userId], references: [id])
+  chekIn          DateTime
+  chekOut         DateTime
+  finalValue      Int
+  pixCode         String?
+  pixQrCodeBase64 String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Favoritos {

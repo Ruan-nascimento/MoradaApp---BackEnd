@@ -19,7 +19,7 @@ const reviews: ReviewData[] = JSON.parse(rawData)
 
 const BATCH_SIZE = 50
 
-async function main() {
+export async function seedReviews() {
   console.log(`🔄 Iniciando seed de reviews... (${reviews.length} registros)`)
 
   let inserted = 0
@@ -61,10 +61,3 @@ async function main() {
 
   console.log(`✅ ${reviews.length} reviews inseridos/atualizados com sucesso!`)
 }
-
-main()
-  .catch((e) => {
-    console.error("❌ Erro ao rodar seed de reviews:", e)
-    process.exit(1)
-  })
-  .finally(() => prisma.$disconnect())
