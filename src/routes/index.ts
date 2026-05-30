@@ -8,6 +8,7 @@ import { cancelarReservaController } from '../controllers/cancelarReserva.contro
 import { authMiddleware } from '../middlewares/auth';
 import { meController } from '../controllers/me.controller';
 import { listImoveisController } from '../controllers/listImoveis.controller';
+import { getImovelByIdController } from '../controllers/getImovelById.controller';
 
 const router = Router();
 
@@ -34,5 +35,8 @@ router.delete('/cancelar-reserva', authMiddleware, cancelarReservaController)
 
 // vai listar os imoveis disponiveis com paginação
 router.get('/imoveis', listImoveisController)
+
+// vai buscar um imovel especifico por id com todos os dados relacionados
+router.get('/imoveis/:id', getImovelByIdController)
 
 export default router;
