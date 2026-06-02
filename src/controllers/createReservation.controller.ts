@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { prisma } from "../lib/prisma";
-import { AuthRequest } from "../middlewares/auth";
+import { AuthRequest } from "../interfaces/auth";
+import { normalizeCheckDates } from "../utils/normalizeCheckDates";
+import { calculateNights } from "../utils/calculateNights";
 
 export const createReservationController = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
@@ -21,7 +23,6 @@ export const createReservationController = async (req: AuthRequest, res: Respons
       });
     }
 
-    // Buscar usuário
     const user = await prisma.usuario.findUnique({
       where: { id: userId },
     });
@@ -33,7 +34,6 @@ export const createReservationController = async (req: AuthRequest, res: Respons
       });
     }
 
-    // Buscar imóvel
     const imovel = await prisma.imoveis.findUnique({
       where: { id: imoveisId },
     });
@@ -45,13 +45,8 @@ export const createReservationController = async (req: AuthRequest, res: Respons
       });
     }
 
-    // Processar datas às 12:00
-    const checkInDate = new Date(chekIn);
-    const checkOutDate = new Date(chekOut);
-    checkInDate.setHours(12, 0, 0, 0);
-    checkOutDate.setHours(12, 0, 0, 0);
+    const { checkInDate, checkOutDate } = normalizeCheckDates(chekIn, chekOut);
 
-    // Validação de colisão de datas
     const conflito = await prisma.reservas.findFirst({
       where: {
         imoveisId,
@@ -71,11 +66,9 @@ export const createReservationController = async (req: AuthRequest, res: Respons
       });
     }
 
-    const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
-    const nights = Math.max(1, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+    const nights = calculateNights(checkInDate, checkOutDate);
     const finalValue = imovel.price * nights;
 
-    // Criar a reserva de fato no banco de dados
     const reserva = await prisma.reservas.create({
       data: {
         imoveisId,

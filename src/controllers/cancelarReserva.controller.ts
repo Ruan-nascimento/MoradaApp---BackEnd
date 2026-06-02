@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { prisma } from "../lib/prisma";
-import { AuthRequest } from "../middlewares/auth";
+import { AuthRequest } from "../interfaces/auth";
 
 export const cancelarReservaController = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
@@ -23,7 +23,6 @@ export const cancelarReservaController = async (req: AuthRequest, res: Response)
       });
     }
 
-    // Buscar reserva para verificar se pertence ao usuário
     const reserva = await prisma.reservas.findUnique({
       where: { id: reservaId },
     });

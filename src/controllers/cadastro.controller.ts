@@ -6,12 +6,7 @@ import {
     validateName,
     validatePassword,
 } from "../utils/validateUserCadastro";
-
-interface CadastroControllerProps {
-    email?: string;
-    password?: string;
-    name?: string;
-}
+import { CadastroControllerProps } from "../interfaces/cadastro";
 
 export const cadastroController = async (req: Request, res: Response) => {
     const { email, password, name } = req.body as CadastroControllerProps;

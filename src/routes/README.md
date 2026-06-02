@@ -91,6 +91,100 @@ Content-Type: application/json
 
 ---
 
+### `GET /imoveis`
+
+Lista todos os imóveis disponíveis com **paginação**.
+
+**Query Params:**
+
+| Param | Tipo | Default | Descrição |
+|-------|------|---------|-----------|
+| `page` | number | `1` | Página atual |
+| `limit` | number | `16` | Itens por página |
+
+**Resposta de sucesso (`200`):**
+```json
+{
+  "data": [
+    {
+      "id": "abc-123",
+      "title": "Apartamento em Boa Viagem",
+      "photo": "https://...",
+      "uf": "PE",
+      "city": "Recife",
+      "price": 150,
+      "reviews": [{ "stars": 5 }, { "stars": 4 }]
+    }
+  ],
+  "total": 48,
+  "page": 1,
+  "limit": 16,
+  "hasNextPage": true
+}
+```
+
+**Respostas de erro:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `500` | Erro interno | `{ "success": false, "message": "Erro ao buscar os imóveis" }` |
+
+---
+
+### `GET /imoveis/:id`
+
+Retorna um imóvel específico com **host**, **highlights** e **reviews**.
+
+**Params:**
+
+| Param | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string (UUID) | ID do imóvel |
+
+**Resposta de sucesso (`200`):**
+```json
+{
+  "data": {
+    "id": "abc-123",
+    "title": "Apartamento em Boa Viagem",
+    "photo": "https://...",
+    "uf": "PE",
+    "city": "Recife",
+    "price": 150,
+    "host": {
+      "id": "host-1",
+      "name": "Maria",
+      "photo": "https://...",
+      "createdAt": "2026-01-01T..."
+    },
+    "highlights": [
+      { "id": "h-1", "name": "Wi-Fi" }
+    ],
+    "reviews": [
+      {
+        "id": "r-1",
+        "name": "João",
+        "imgUser": "https://...",
+        "stars": 5,
+        "comment": "Excelente!",
+        "createdAt": "2026-05-01T..."
+      }
+    ]
+  },
+  "success": true
+}
+```
+
+**Respostas de erro:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `400` | ID não fornecido | `{ "success": false, "message": "ID do imóvel não fornecido" }` |
+| `404` | Imóvel não encontrado | `{ "success": false, "message": "Imóvel não encontrado" }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro ao buscar o imóvel" }` |
+
+---
+
 ## 🔐 Rotas Protegidas (exigem token)
 
 Essas rotas passam pelo `authMiddleware` **antes** do controller. O middleware:
@@ -134,9 +228,10 @@ Authorization: Bearer <token>
     "reservas": [
       {
         "id": "a1b2c3d4-...",
-        "nome": "Restaurante Sabor Nordestino",
-        "data": "2026-05-20",
-        "hora": "12:30",
+        "imoveisId": "xyz-789",
+        "chekIn": "2026-05-20T12:00:00.000Z",
+        "chekOut": "2026-05-22T12:00:00.000Z",
+        "finalValue": 300,
         "userId": "c1231719-...",
         "createdAt": "2026-05-19T...",
         "updatedAt": "2026-05-19T..."
@@ -152,12 +247,7 @@ Authorization: Bearer <token>
 | Status | Situação | Exemplo |
 |--------|----------|---------|
 | `400` | Usuário não encontrado no banco | `{ "message": "Usuário não encontrado", "success": false }` |
-| `500` | Erro interno | `{ "message": "Erro desconhecido ao buscar usuário...", "success": false }` |
-
-**Fluxo interno:**
-1. O middleware já injetou `req.userId`
-2. Busca o usuário pelo `id` com `select` (id, email, name, reservas)
-3. Retorna o objeto do usuário com todas as suas reservas
+| `500` | Erro interno | `{ "message": "Erro ao buscar usuário...", "success": false }` |
 
 ---
 
@@ -178,18 +268,10 @@ Authorization: Bearer <token>
   "data": [
     {
       "id": "a1b2c3d4-...",
-      "nome": "Restaurante Sabor Nordestino",
-      "data": "2026-05-20",
-      "hora": "12:30",
-      "userId": "c1231719-...",
-      "createdAt": "2026-05-19T...",
-      "updatedAt": "2026-05-19T..."
-    },
-    {
-      "id": "e5f6g7h8-...",
-      "nome": "Clínica Vida Mais",
-      "data": "2026-05-21",
-      "hora": "09:00",
+      "imoveisId": "xyz-789",
+      "chekIn": "2026-05-20T12:00:00.000Z",
+      "chekOut": "2026-05-22T12:00:00.000Z",
+      "finalValue": 300,
       "userId": "c1231719-...",
       "createdAt": "2026-05-19T...",
       "updatedAt": "2026-05-19T..."
@@ -203,27 +285,221 @@ Authorization: Bearer <token>
 
 | Status | Situação | Exemplo |
 |--------|----------|---------|
-| `404` | Nenhum dado encontrado | `{ "message": "Nenhum dado encontrado", "success": false }` |
 | `500` | Erro interno | `{ "message": "Erro ao buscar dados", "success": false }` |
 
+---
+
+### `POST /criar-reserva`
+
+Cria uma nova reserva para o usuário autenticado.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "imoveisId": "abc-123",
+  "chekIn": "2026-06-10",
+  "chekOut": "2026-06-12"
+}
+```
+
+**Respostas:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `201` | Reserva criada | `{ "success": true, "message": "Reserva criada com sucesso!", "data": { ... } }` |
+| `400` | Dados incompletos | `{ "success": false, "message": "Dados incompletos para criar reserva." }` |
+| `400` | Conflito de datas | `{ "success": false, "message": "Este imóvel já está reservado no período selecionado." }` |
+| `401` | Não autenticado | `{ "success": false, "message": "Usuário não autenticado." }` |
+| `404` | Usuário/Imóvel não encontrado | `{ "success": false, "message": "Imóvel não encontrado." }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro interno do servidor ao criar reserva." }` |
+
 **Fluxo interno:**
-1. Busca todas as reservas com `prisma.reservas.findMany()`
-2. Se a lista estiver vazia, retorna `200` com array vazio
-3. Se houver dados, retorna `200` com o array completo
+1. Valida dados obrigatórios (`imoveisId`, `chekIn`, `chekOut`)
+2. Verifica existência do usuário e do imóvel
+3. Normaliza datas para 12h
+4. Verifica conflito de datas (evita double-booking)
+5. Calcula valor final (preço × noites)
+6. Cria a reserva no banco
+
+---
+
+### `POST /confirmar-reserva`
+
+Confirma a reserva no banco de dados após verificação de conflitos.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "imoveisId": "abc-123",
+  "chekIn": "2026-06-10",
+  "chekOut": "2026-06-12",
+  "finalValue": 300,
+  "pixCode": "00020126...",
+  "pixQrCodeBase64": "data:image/png;base64,..."
+}
+```
+
+**Respostas:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `201` | Reserva confirmada | `{ "success": true, "message": "Reserva confirmada com sucesso!", "data": { ... } }` |
+| `400` | Dados insuficientes | `{ "success": false, "message": "Dados insuficientes para confirmar a reserva." }` |
+| `400` | Conflito de datas | `{ "success": false, "message": "Este imóvel já foi reservado por outro usuário para esse período." }` |
+| `401` | Não autenticado | `{ "success": false, "message": "Usuário não autenticado." }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro interno do servidor ao confirmar a reserva." }` |
+
+**Fluxo interno:**
+1. Valida dados obrigatórios (`imoveisId`, `chekIn`, `chekOut`, `finalValue`)
+2. Normaliza datas e verifica conflito de datas
+3. Cria a reserva no banco
+
+
+---
+
+### `POST /listar-reservas`
+
+Lista todas as reservas do usuário autenticado com dados do imóvel.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Body:** nenhum (usa userId do token)
+
+**Resposta de sucesso (`200`):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "res-123",
+      "imoveisId": "abc-123",
+      "userId": "user-1",
+      "chekIn": "2026-06-10T12:00:00.000Z",
+      "chekOut": "2026-06-12T12:00:00.000Z",
+      "finalValue": 300,
+      "imoveis": {
+        "id": "abc-123",
+        "title": "Apartamento em Boa Viagem",
+        "photo": "https://...",
+        "city": "Recife",
+        "uf": "PE",
+        "price": 150
+      }
+    }
+  ]
+}
+```
+
+**Respostas de erro:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `401` | Não autenticado | `{ "success": false, "message": "Usuário não autenticado." }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro interno ao listar reservas." }` |
+
+---
+
+### `DELETE /cancelar-reserva`
+
+Cancela (deleta) uma reserva do usuário autenticado.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body (JSON) ou Query:**
+```json
+{
+  "id": "res-123"
+}
+```
+Ou via query string: `?id=res-123`
+
+**Respostas:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `200` | Reserva cancelada | `{ "success": true, "message": "Reserva cancelada com sucesso." }` |
+| `400` | ID não fornecido | `{ "success": false, "message": "ID da reserva não fornecido." }` |
+| `401` | Não autenticado | `{ "success": false, "message": "Usuário não autenticado." }` |
+| `403` | Sem permissão | `{ "success": false, "message": "Você não tem permissão para cancelar esta reserva." }` |
+| `404` | Reserva não encontrada | `{ "success": false, "message": "Reserva não encontrada." }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro interno do servidor ao cancelar reserva." }` |
+
+**Fluxo interno:**
+1. Extrai o ID da reserva do body ou query string
+2. Busca a reserva e verifica se pertence ao usuário
+3. Se pertence, deleta a reserva
+
+---
+
+### `POST /adicionar-favorito`
+
+Adiciona um imóvel aos favoritos do usuário.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "imoveisId": "abc-123"
+}
+```
+
+**Respostas:**
+
+| Status | Situação | Exemplo |
+|--------|----------|---------|
+| `201` | Favorito adicionado | `{ "success": true, "message": "Imóvel adicionado aos favoritos!", "data": { ... } }` |
+| `400` | ID não fornecido | `{ "success": false, "message": "ID do imóvel não fornecido." }` |
+| `401` | Não autenticado | `{ "success": false, "message": "Usuário não autenticado." }` |
+| `404` | Imóvel não encontrado | `{ "success": false, "message": "Imóvel não encontrado." }` |
+| `409` | Já nos favoritos | `{ "success": false, "message": "Este imóvel já está nos seus favoritos." }` |
+| `500` | Erro interno | `{ "success": false, "message": "Erro interno do servidor ao adicionar favorito." }` |
+
+**Fluxo interno:**
+1. Verifica se o imóvel existe
+2. Verifica se já está nos favoritos (evita duplicidade)
+3. Cria o registro de favorito
 
 ---
 
 ## 📋 Resumo Rápido
 
-|   Método    |          Rota            | Auth |                    Descrição                       |
-|-------------|--------------------------|------|----------------------------------------------------|
-| `POST`      | `/api/login`             |  ❌  | Autentica e retorna JWT |
-| `POST`      | `/api/cadastro`          |  ❌  | Cria novo usuário |
-| `GET`       | `/api/me`                |  🔐  | Dados do usuário logado + reservas |
-| `GET`       | `/api/get-all-data`      |  🔐  | Todas as reservas do banco |
-| `POST`      | `/api/criar-reserva`     |  🔐  | Cria nova reserva |
-| `POST`      | `/api/listar-reservas`   |  🔐  | Lista reservas do usuário |
-| `DELETE`    | `/api/cancelar-reserva`  |  🔐  | Cancela uma reserva |
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| `POST` | `/api/login` | ❌ | Autentica e retorna JWT |
+| `POST` | `/api/cadastro` | ❌ | Cria novo usuário |
+| `GET` | `/api/imoveis` | ❌ | Lista imóveis com paginação |
+| `GET` | `/api/imoveis/:id` | ❌ | Detalhes de um imóvel |
+| `GET` | `/api/me` | 🔐 | Dados do usuário logado + reservas |
+| `GET` | `/api/get-all-data` | 🔐 | Todas as reservas do banco |
+| `POST` | `/api/criar-reserva` | 🔐 | Cria nova reserva |
+| `POST` | `/api/confirmar-reserva` | 🔐 | Confirma a reserva |
+| `POST` | `/api/listar-reservas` | 🔐 | Lista reservas do usuário |
+| `DELETE` | `/api/cancelar-reserva` | 🔐 | Cancela uma reserva |
+| `POST` | `/api/adicionar-favorito` | 🔐 | Adiciona imóvel aos favoritos |
 
 ---
 
@@ -253,4 +529,52 @@ curl -X GET http://localhost:3000/api/me \
 ```bash
 curl -X GET http://localhost:3000/api/get-all-data \
   -H "Authorization: Bearer <SEU_TOKEN_AQUI>"
+```
+
+**Listar Imóveis:**
+```bash
+curl -X GET "http://localhost:3000/api/imoveis?page=1&limit=16"
+```
+
+**Buscar Imóvel por ID:**
+```bash
+curl -X GET http://localhost:3000/api/imoveis/<ID_DO_IMOVEL>
+```
+
+**Criar Reserva (autenticado):**
+```bash
+curl -X POST http://localhost:3000/api/criar-reserva \
+  -H "Authorization: Bearer <SEU_TOKEN_AQUI>" \
+  -H "Content-Type: application/json" \
+  -d '{"imoveisId": "<ID>", "chekIn": "2026-06-10", "chekOut": "2026-06-12"}'
+```
+
+**Confirmar Reserva (autenticado):**
+```bash
+curl -X POST http://localhost:3000/api/confirmar-reserva \
+  -H "Authorization: Bearer <SEU_TOKEN_AQUI>" \
+  -H "Content-Type: application/json" \
+  -d '{"imoveisId": "<ID>", "chekIn": "2026-06-10", "chekOut": "2026-06-12", "finalValue": 300}'
+```
+
+**Listar Reservas (autenticado):**
+```bash
+curl -X POST http://localhost:3000/api/listar-reservas \
+  -H "Authorization: Bearer <SEU_TOKEN_AQUI>"
+```
+
+**Cancelar Reserva (autenticado):**
+```bash
+curl -X DELETE http://localhost:3000/api/cancelar-reserva \
+  -H "Authorization: Bearer <SEU_TOKEN_AQUI>" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "<ID_DA_RESERVA>"}'
+```
+
+**Adicionar Favorito (autenticado):**
+```bash
+curl -X POST http://localhost:3000/api/adicionar-favorito \
+  -H "Authorization: Bearer <SEU_TOKEN_AQUI>" \
+  -H "Content-Type: application/json" \
+  -d '{"imoveisId": "<ID_DO_IMOVEL>"}'
 ```

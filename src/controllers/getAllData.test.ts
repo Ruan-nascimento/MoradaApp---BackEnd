@@ -2,7 +2,6 @@ import request from "supertest";
 import { describe, it, expect } from "vitest";
 import { app } from "../app";
 import { prisma } from "../lib/prisma";
-import { createToken } from "../utils/createToken";
 import { createAuthenticatedUser } from "../utils/createUserTest";
 
 describe("Get All Data Controller", () => {

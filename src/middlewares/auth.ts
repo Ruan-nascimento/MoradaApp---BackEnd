@@ -1,13 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { TokenPayload, AuthRequest } from "../interfaces/auth";
 
-interface TokenPayload {
-    id: string;
-}
-
-export interface AuthRequest extends Request {
-    userId?: string;
-}
+export { AuthRequest };
 
 export function authMiddleware(
     req: AuthRequest,

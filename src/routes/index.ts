@@ -6,6 +6,7 @@ import { createReservationController } from '../controllers/createReservation.co
 import { confirmReservationController } from '../controllers/confirmReservation.controller';
 import { listarReservasController } from '../controllers/listarReservas.controller';
 import { cancelarReservaController } from '../controllers/cancelarReserva.controller';
+import { adicionarFavoritoController } from '../controllers/adicionarFavorito.controller';
 import { authMiddleware } from '../middlewares/auth';
 import { meController } from '../controllers/me.controller';
 import { listImoveisController } from '../controllers/listImoveis.controller';
@@ -13,34 +14,16 @@ import { getImovelByIdController } from '../controllers/getImovelById.controller
 
 const router = Router();
 
-// vai retornar os dados do usuário logado
 router.get('/me', authMiddleware, meController)
-
-// vai enviar email e senha para ser verificado no banco de dados e retornar token de acesso
 router.post('/login', loginController)
-
-// vai receber os dados do formulario de cadastro e cadastrar no banco de dados
 router.post('/cadastro', cadastroController)
-
-// vai retornar todos os dados mockados do banco de dados para o frontend
 router.get('/get-all-data', authMiddleware, getAllDataController)
-
-// vai pegar os dados da reserva selecionada e salvar no banco de dados como uma reserva do usuário
 router.post('/criar-reserva', authMiddleware, createReservationController)
-
-// vai simular pagamento e persistir a reserva de fato no banco de dados
 router.post('/confirmar-reserva', authMiddleware, confirmReservationController)
-
-// vai buscar no banco de dados todas as reservas feitas pelo usuário logado 
 router.post('/listar-reservas', authMiddleware, listarReservasController)
-
-// vai receber o id da reserva e deletar ela do banco de dados
 router.delete('/cancelar-reserva', authMiddleware, cancelarReservaController)
-
-// vai listar os imoveis disponiveis com paginação
+router.post('/adicionar-favorito', authMiddleware, adicionarFavoritoController)
 router.get('/imoveis', listImoveisController)
-
-// vai buscar um imovel especifico por id com todos os dados relacionados
 router.get('/imoveis/:id', getImovelByIdController)
 
 export default router;

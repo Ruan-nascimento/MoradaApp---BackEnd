@@ -2,18 +2,12 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
-interface LoginProps {
-    email: string
-    password: string
-}
+import { LoginProps } from "../interfaces/auth";
 
 export const loginController = async (req: Request, res: Response) => {
-
     const { email, password } = req.body as LoginProps;
 
     try {
-
         if (!email || !password) {
             return res.status(400).json({
                 message: "Email e senha são obrigatórios",
@@ -60,13 +54,10 @@ export const loginController = async (req: Request, res: Response) => {
             token,
             success: true
         });
-
     } catch (error) {
         return res.status(500).json({
             message: "Erro desconhecido ao fazer login. Tente Novamente!",
             success: false
         });
     }
-
-
-}
+};

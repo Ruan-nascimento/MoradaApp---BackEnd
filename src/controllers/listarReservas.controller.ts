@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { prisma } from "../lib/prisma";
-import { AuthRequest } from "../middlewares/auth";
+import { AuthRequest } from "../interfaces/auth";
 
 export const listarReservasController = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
