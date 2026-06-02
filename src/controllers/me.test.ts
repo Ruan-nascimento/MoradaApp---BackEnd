@@ -9,16 +9,6 @@ import { createToken } from "../utils/createToken";
 describe("Me Controller", () => {
     const rotaMe = "/api/me";
 
-    beforeEach(async () => {
-        await prisma.reservas.deleteMany();
-        await prisma.favoritos.deleteMany();
-        await prisma.reviews.deleteMany();
-        await prisma.highlights.deleteMany();
-        await prisma.imoveis.deleteMany();
-        await prisma.host.deleteMany();
-        await prisma.usuario.deleteMany();
-    });
-
     it("deve retornar os dados do usuário autenticado", async () => {
         const user = await prisma.usuario.create({
             data: {
