@@ -7,6 +7,8 @@ import { confirmReservationController } from '../controllers/confirmReservation.
 import { listarReservasController } from '../controllers/listarReservas.controller';
 import { cancelarReservaController } from '../controllers/cancelarReserva.controller';
 import { adicionarFavoritoController } from '../controllers/adicionarFavorito.controller';
+import { removerFavoritoController } from '../controllers/removerFavorito.controller';
+import { listarFavoritosController } from '../controllers/listarFavoritos.controller';
 import { authMiddleware } from '../middlewares/auth';
 import { meController } from '../controllers/me.controller';
 import { listImoveisController } from '../controllers/listImoveis.controller';
@@ -23,7 +25,10 @@ router.post('/confirmar-reserva', authMiddleware, confirmReservationController)
 router.post('/listar-reservas', authMiddleware, listarReservasController)
 router.delete('/cancelar-reserva', authMiddleware, cancelarReservaController)
 router.post('/adicionar-favorito', authMiddleware, adicionarFavoritoController)
+router.delete('/remover-favorito', authMiddleware, removerFavoritoController)
+router.get('/favoritos', authMiddleware, listarFavoritosController)
 router.get('/imoveis', listImoveisController)
 router.get('/imoveis/:id', getImovelByIdController)
 
 export default router;
+

@@ -57,6 +57,8 @@ model Imoveis {
   uf         String
   city       String
   title      String
+  latitude   Float?
+  longitude  Float?
   hostId     String
   host       Host         @relation(fields: [hostId], references: [id])
   highlights Highlights[]

@@ -2753,26 +2753,98 @@ const imoveis = [
 
 import { prisma } from '../../src/lib/prisma'
 
+const coordenadasCidades: Record<string, { lat: number; lng: number }> = {
+  "Balneário Camboriú": { lat: -26.9916, lng: -48.6346 },
+  "Feira de Santana": { lat: -12.2664, lng: -38.9662 },
+  "Itacoatiara": { lat: -3.1431, lng: -58.4442 },
+  "Goiânia": { lat: -16.6869, lng: -49.2648 },
+  "Joinville": { lat: -26.3044, lng: -48.8456 },
+  "Imperatriz": { lat: -5.5264, lng: -47.4917 },
+  "Ubatuba": { lat: -23.4339, lng: -45.0711 },
+  "Ouro Preto": { lat: -20.3856, lng: -43.5035 },
+  "Tiradentes": { lat: -21.1102, lng: -44.1784 },
+  "Petrópolis": { lat: -22.5050, lng: -43.1786 },
+  "Florianópolis": { lat: -27.5954, lng: -48.5480 },
+  "Santana": { lat: -0.0583, lng: -51.1817 },
+  "Poços de Caldas": { lat: -21.7869, lng: -46.5681 },
+  "Juazeiro do Norte": { lat: -7.2189, lng: -39.3149 },
+  "Barreirinhas": { lat: -2.7469, lng: -42.8262 },
+  "Dourados": { lat: -22.2238, lng: -54.8064 },
+  "Arapiraca": { lat: -9.7517, lng: -36.6606 },
+  "Mossoró": { lat: -5.1881, lng: -37.3442 },
+  "Marabá": { lat: -5.3744, lng: -49.1242 },
+  "Gramado": { lat: -29.3746, lng: -50.8764 },
+  "Ilhéus": { lat: -14.7889, lng: -39.0494 },
+  "Bento Gonçalves": { lat: -29.1711, lng: -51.5186 },
+  "Paraty": { lat: -22.2178, lng: -44.7131 },
+  "Santos": { lat: -23.9608, lng: -46.3339 },
+  "Canindé de São Francisco": { lat: -9.6425, lng: -37.7886 },
+  "Brasília": { lat: -15.7938, lng: -47.8827 },
+  "Canoa Quebrada": { lat: -4.5247, lng: -37.7029 },
+  "Campo Grande": { lat: -20.4435, lng: -54.6478 },
+  "Parintins": { lat: -2.6289, lng: -56.7358 },
+  "Niterói": { lat: -22.8858, lng: -43.1153 },
+  "João Pessoa": { lat: -7.1198, lng: -34.8450 },
+  "Maringá": { lat: -23.4209, lng: -51.9331 },
+  "Canela": { lat: -29.3653, lng: -50.8119 },
+  "Ribeirão Preto": { lat: -21.1704, lng: -47.8103 },
+  "Belo Horizonte": { lat: -19.9167, lng: -43.9345 },
+  "Guarapari": { lat: -20.6692, lng: -40.4975 },
+  "Porto Alegre": { lat: -30.0346, lng: -51.2177 },
+  "Ceilândia": { lat: -15.8206, lng: -48.1147 },
+  "Campina Grande": { lat: -7.2247, lng: -35.8772 },
+  "Blumenau": { lat: -26.9194, lng: -49.0661 },
+  "Porto Seguro": { lat: -16.4258, lng: -39.0664 },
+  "Curitiba": { lat: -25.4290, lng: -49.2671 },
+  "Manaus": { lat: -3.1190, lng: -60.0217 },
+  "Pirenópolis": { lat: -15.8525, lng: -48.9592 },
+  "São Luís": { lat: -2.5307, lng: -44.3068 },
+  "Jericoacoara": { lat: -2.7958, lng: -40.5142 },
+  "Jalapão": { lat: -10.4500, lng: -46.7700 },
+  "Maragogi": { lat: -9.0122, lng: -35.2222 },
+  "Búzios": { lat: -22.7558, lng: -41.8883 },
+  "Bonito": { lat: -21.1216, lng: -56.4822 },
+  "Sinop": { lat: -11.8622, lng: -55.5039 },
+  "Recife": { lat: -8.0542, lng: -34.8813 },
+  "São Raimundo Nonato": { lat: -9.0139, lng: -42.6994 },
+  "Caldas Novas": { lat: -17.7408, lng: -48.6253 },
+  "São Paulo": { lat: -23.5505, lng: -46.6333 },
+  "Campinas": { lat: -22.9056, lng: -47.0608 },
+};
+
 export async function seedImoveis() {
   for (let i = 0; i < imoveis.length; i++) {
+    const imovel = imoveis[i];
+    const coord = coordenadasCidades[imovel.city] || { lat: -15.7938, lng: -47.8827 };
+    
+    // Gerar jitter determinístico baseado no índice do imóvel
+    const jitterLat = Math.sin(i) * 0.015;
+    const jitterLng = Math.cos(i) * 0.015;
+    const latitude = coord.lat + jitterLat;
+    const longitude = coord.lng + jitterLng;
+
     await prisma.imoveis.upsert({
-      where: { id: imoveis[i].id },
+      where: { id: imovel.id },
       update: {
-        photo: imoveis[i].photo,
-        uf: imoveis[i].uf,
-        city: imoveis[i].city,
-        title: imoveis[i].title,
-        hostId: imoveis[i].hostId,
-        price: imoveis[i].price,
+        photo: imovel.photo,
+        uf: imovel.uf,
+        city: imovel.city,
+        title: imovel.title,
+        hostId: imovel.hostId,
+        price: imovel.price,
+        latitude: latitude,
+        longitude: longitude,
       },
       create: {
-        id: imoveis[i].id,
-        photo: imoveis[i].photo,
-        uf: imoveis[i].uf,
-        city: imoveis[i].city,
-        title: imoveis[i].title,
-        hostId: imoveis[i].hostId,
-        price: imoveis[i].price,
+        id: imovel.id,
+        photo: imovel.photo,
+        uf: imovel.uf,
+        city: imovel.city,
+        title: imovel.title,
+        hostId: imovel.hostId,
+        price: imovel.price,
+        latitude: latitude,
+        longitude: longitude,
       },
     })
   }
