@@ -24,6 +24,17 @@ export const confirmReservationController = async (req: AuthRequest, res: Respon
 
     const { checkInDate, checkOutDate } = normalizeCheckDates(chekIn, chekOut);
 
+    const imovel = await prisma.imoveis.findUnique({
+      where: { id: imoveisId },
+    });
+
+    if (!imovel) {
+      return res.status(404).json({
+        success: false,
+        message: "Imóvel não encontrado.",
+      });
+    }
+
     const conflito = await prisma.reservas.findFirst({
       where: {
         imoveisId,
@@ -39,7 +50,7 @@ export const confirmReservationController = async (req: AuthRequest, res: Respon
     if (conflito) {
       return res.status(400).json({
         success: false,
-        message: "Este imóvel já foi reservado por outro usuário para esse período.",
+        message: `Não será possível reservar o ${imovel.title} no dia selecionado.`,
       });
     }
 

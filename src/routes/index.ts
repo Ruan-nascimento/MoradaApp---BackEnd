@@ -13,6 +13,7 @@ import { authMiddleware } from '../middlewares/auth';
 import { meController } from '../controllers/me.controller';
 import { listImoveisController } from '../controllers/listImoveis.controller';
 import { getImovelByIdController } from '../controllers/getImovelById.controller';
+import { updatePhotoController } from '../controllers/updatePhoto.controller';
 
 const router = Router();
 
@@ -29,6 +30,7 @@ router.delete('/remover-favorito', authMiddleware, removerFavoritoController)
 router.get('/favoritos', authMiddleware, listarFavoritosController)
 router.get('/imoveis', listImoveisController)
 router.get('/imoveis/:id', getImovelByIdController)
+router.post('/update-photo', authMiddleware, updatePhotoController)
 
 export default router;
 

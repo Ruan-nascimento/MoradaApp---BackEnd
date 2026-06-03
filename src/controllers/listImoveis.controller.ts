@@ -6,9 +6,21 @@ export const listImoveisController = async (req: Request, res: Response): Promis
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 16;
     const skip = (page - 1) * limit;
+    const search = req.query.search as string;
+
+    const where: any = search
+      ? {
+          OR: [
+            { title: { contains: search, mode: "insensitive" } },
+            { city: { contains: search, mode: "insensitive" } },
+            { uf: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {};
 
     const [imoveis, total] = await Promise.all([
       prisma.imoveis.findMany({
+        where,
         skip: skip,
         take: limit,
         include: {
@@ -24,7 +36,7 @@ export const listImoveisController = async (req: Request, res: Response): Promis
           { id: "asc" }
         ]
       }),
-      prisma.imoveis.count()
+      prisma.imoveis.count({ where })
     ]);
 
     return res.status(200).json({

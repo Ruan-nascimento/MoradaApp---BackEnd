@@ -11,6 +11,7 @@ model Usuario {
   email     String      @unique
   name      String
   password  String
+  photo     String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   reservas  Reservas[]

@@ -62,7 +62,7 @@ export const createReservationController = async (req: AuthRequest, res: Respons
     if (conflito) {
       return res.status(400).json({
         success: false,
-        message: "Este imóvel já está reservado no período selecionado.",
+        message: `Não será possível reservar o ${imovel.title} no dia selecionado.`,
       });
     }
 
