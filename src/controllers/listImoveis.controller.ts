@@ -12,6 +12,9 @@ export const listImoveisController = async (req: Request, res: Response): Promis
         skip: skip,
         take: limit,
         include: {
+          host: {
+            select: { id: true, name: true, photo: true }
+          },
           reviews: {
             select: { stars: true }
           }
